@@ -19,7 +19,7 @@ body, html {
 .chat-bg-sidebar { background-color: #f8f9fa; }
 .chat-bg { 
     background-color: var(--chat-bg); 
-    background-image: url("https://www.transparenttextures.com/patterns/cubes.png"); /* Subtle pattern */
+    background-image: url("https://www.transparenttextures.com/patterns/cubes.png");
 }
 
 /* UI Elements */
@@ -29,6 +29,23 @@ body, html {
 .icon-btn-lg:hover { transform: scale(1.1); }
 
 .avatar { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+
+/* Large Call Avatar (First Letter) */
+.call-avatar-lg {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #0084ff, #0056b3);
+    color: white;
+    font-size: 4rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    border: 4px solid rgba(255, 255, 255, 0.2);
+}
+
 .shadow-inner { box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); }
 
 /* User List Items */
@@ -64,7 +81,7 @@ body, html {
 .msg-text { font-size: 0.95rem; line-height: 1.4; }
 .msg-time { font-size: 0.7rem; float: right; margin-left: 12px; margin-top: 6px; opacity: 0.8; }
 
-/* File Bubble Styles */
+/* File Bubble */
 .file-bubble { display: flex; align-items: center; gap: 12px; background: rgba(0,0,0,0.05); padding: 8px; border-radius: 12px; margin-top: 5px; }
 .sent .file-bubble { background: rgba(255,255,255,0.2); }
 
@@ -76,11 +93,30 @@ body, html {
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: #bcc0c4; border-radius: 10px; }
 
+/* Animations */
 .pulse-anim { animation: pulse 1.5s infinite; }
 @keyframes pulse {
-    0% { opacity: 1; }
-    50% { opacity: 0.5; }
-    100% { opacity: 1; }
+    0% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7); }
+    70% { box-shadow: 0 0 0 15px rgba(40, 167, 69, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0); }
+}
+
+.incoming-ring-anim {
+    width: 80px;
+    height: 80px;
+    background: #0084ff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    animation: ringing 1.2s infinite ease-in-out;
+}
+
+@keyframes ringing {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 132, 255, 0.7); }
+    50% { transform: scale(1.1); box-shadow: 0 0 0 20px rgba(0, 132, 255, 0); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 132, 255, 0); }
 }
 
 @media (max-width: 991px) {
