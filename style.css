@@ -1,0 +1,88 @@
+:root {
+    --primary-blue: #0084ff;
+    --light-blue: #e5f2ff;
+    --chat-bg: #efeae2;
+    --header-bg: #ffffff;
+    --bubble-sent: #0084ff;
+    --bubble-received: #ffffff;
+}
+
+body, html {
+    height: 100%;
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--header-bg);
+}
+
+.app-bg { background-color: var(--header-bg); }
+.header-bg { background-color: var(--header-bg); }
+.chat-bg-sidebar { background-color: #f8f9fa; }
+.chat-bg { 
+    background-color: var(--chat-bg); 
+    background-image: url("https://www.transparenttextures.com/patterns/cubes.png"); /* Subtle pattern */
+}
+
+/* UI Elements */
+.icon-btn { width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+.icon-btn:hover { transform: scale(1.05); }
+.icon-btn-lg { width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; transition: 0.2s; }
+.icon-btn-lg:hover { transform: scale(1.1); }
+
+.avatar { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+.shadow-inner { box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); }
+
+/* User List Items */
+.user-item { transition: background-color 0.2s; cursor: pointer; border-radius: 12px; background: white; }
+.user-item:hover { background-color: #f1f3f5; }
+.online-dot { width: 10px; height: 10px; border-radius: 50%; background-color: #31a24c; display: inline-block; }
+
+/* Chat Bubbles */
+.message-bubble {
+    max-width: 75%;
+    padding: 10px 16px;
+    margin-bottom: 12px;
+    border-radius: 18px;
+    position: relative;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    word-wrap: break-word;
+}
+
+.sent {
+    background-color: var(--bubble-sent);
+    color: white;
+    align-self: flex-end;
+    border-bottom-right-radius: 4px;
+}
+.received {
+    background-color: var(--bubble-received);
+    color: #050505;
+    align-self: flex-start;
+    border-bottom-left-radius: 4px;
+}
+
+.msg-sender { font-size: 0.75rem; font-weight: 600; margin-bottom: 4px; color: #65676b; }
+.msg-text { font-size: 0.95rem; line-height: 1.4; }
+.msg-time { font-size: 0.7rem; float: right; margin-left: 12px; margin-top: 6px; opacity: 0.8; }
+
+/* File Bubble Styles */
+.file-bubble { display: flex; align-items: center; gap: 12px; background: rgba(0,0,0,0.05); padding: 8px; border-radius: 12px; margin-top: 5px; }
+.sent .file-bubble { background: rgba(255,255,255,0.2); }
+
+/* Transitions */
+.transition-all { transition: all 0.3s ease-in-out; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #bcc0c4; border-radius: 10px; }
+
+.pulse-anim { animation: pulse 1.5s infinite; }
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+@media (max-width: 991px) {
+    #call-panel { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1050; }
+}
