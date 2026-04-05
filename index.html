@@ -1,195 +1,184 @@
-   <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Real-Time Chat & Call App</title>
-    <!-- Bootstrap 5 CSS -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>HackChat | Terminal</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <!-- Custom CSS -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- Username Entry Modal -->
-    <div class="modal fade" id="usernameModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+    <audio id="ringtone" src="https://assets.mixkit.co/active_storage/sfx/2803/2803-preview.mp3" loop preload="auto"></audio>
+    <audio id="msgSound" src="https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3" preload="auto"></audio>
+
+    <!-- Welcome Modal -->
+    <div class="modal fade" id="joinModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content border-0 shadow-lg">
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title"><i class="bi bi-chat-dots-fill me-2"></i>Join Room</h5>
-                </div>
-                <div class="modal-body p-4">
-                    <p class="text-muted small mb-3">Enter a username to join the global real-time chat.</p>
-                    <input type="text" id="usernameInput" class="form-control form-control-lg bg-light" placeholder="Your Username" autocomplete="off">
-                </div>
-                <div class="modal-footer border-0 pb-4 px-4">
-                    <button type="button" id="joinBtn" class="btn btn-primary btn-lg w-100 rounded-pill shadow-sm">Join Chat</button>
+            <div class="modal-content border-0 shadow-lg modal-dark">
+                <div class="modal-body p-5 text-center">
+                    <i class="bi bi-terminal-fill text-accent mb-3" style="font-size:3.5rem;"></i>
+                    <h3 class="mb-2 text-white fw-bold">HackChat</h3>
+                    <p class="text-muted mb-4 small">Peer-to-Peer Encrypted Network</p>
+                    <input type="text" id="usernameInput" class="form-control bg-dark text-white border-secondary mb-4 text-center custom-input" placeholder="Enter Alias" autocomplete="off">
+                    <button type="button" id="joinBtn" class="btn btn-accent btn-lg w-100 fw-bold">INITIALIZE</button>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Incoming Call Modal -->
-    <div class="modal fade" id="incomingCallModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+    <div class="modal fade" id="incomingCallModal" data-bs-backdrop="static" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered modal-sm">
-            <div class="modal-content border-0 shadow-lg bg-dark text-white text-center">
+            <div class="modal-content border-0 shadow-lg modal-dark text-center">
                 <div class="modal-body p-4 pt-5">
-                    <div class="incoming-ring-anim mb-3">
-                        <i id="incomingCallIcon" class="bi bi-telephone-inbound-fill text-white fs-1"></i>
+                    <div class="incoming-ring-anim mb-4">
+                        <i id="callTypeIcon" class="bi bi-telephone-inbound-fill text-dark fs-1"></i>
                     </div>
-                    <h5 id="incomingCallerName" class="mb-1 fw-bold">Someone</h5>
-                    <p class="text-muted small mb-4" id="incomingCallType">Incoming Call...</p>
-                    
-                    <div class="d-flex justify-content-center gap-3">
-                        <button type="button" id="rejectCallBtn" class="btn btn-danger rounded-circle icon-btn-lg shadow">
-                            <i class="bi bi-telephone-x-fill"></i>
-                        </button>
-                        <button type="button" id="acceptCallBtn" class="btn btn-success rounded-circle icon-btn-lg shadow pulse-anim">
-                            <i class="bi bi-telephone-fill"></i>
-                        </button>
+                    <h4 id="incomingCallerName" class="mb-1 fw-bold text-white">Unknown</h4>
+                    <p class="text-accent small mb-4" id="callTypeText">Incoming Secure Link...</p>
+                    <div class="d-flex justify-content-center gap-4">
+                        <button id="rejectBtn" class="btn btn-danger rounded-circle call-action-btn shadow"><i class="bi bi-telephone-x-fill"></i></button>
+                        <button id="acceptBtn" class="btn btn-accent rounded-circle call-action-btn shadow pulse-anim"><i class="bi bi-telephone-fill text-dark"></i></button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Call Target Selection Modal -->
-    <div class="modal fade" id="callSelectModal" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered modal-sm">
-            <div class="modal-content border-0 shadow">
-                <div class="modal-header bg-light">
-                    <h6 class="modal-title fw-bold">Select User to Call</h6>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body p-0">
-                    <div class="list-group list-group-flush" id="callUserList">
-                        <!-- Populated dynamically -->
-                    </div>
-                </div>
-            </div>
+    <!-- ROOT -->
+    <div class="app-root d-flex flex-column w-100 h-100 bg-main">
+
+        <!-- TOP TABS -->
+        <div class="app-tabs bg-panel border-bottom border-secondary d-flex align-items-stretch flex-shrink-0">
+            <button class="tab-btn active" id="tab-chat" onclick="switchTab('chat')">
+                <i class="bi bi-chat-dots-fill"></i><span>Chat</span>
+            </button>
+            <button class="tab-btn" id="tab-participants" onclick="switchTab('participants')">
+                <i class="bi bi-people-fill"></i><span>Participants</span>
+                <span id="participantCount" class="tab-badge">0</span>
+            </button>
+            <button class="tab-btn" id="tab-call" onclick="switchTab('call')">
+                <i class="bi bi-telephone-fill"></i><span>Call</span>
+                <span id="callTabDot" class="tab-dot d-none"></span>
+            </button>
         </div>
-    </div>
 
-    <!-- Main Application Container -->
-    <div class="container-fluid h-100 p-0 overflow-hidden app-bg">
-        <div class="row h-100 g-0">
-            
-            <!-- 📱 LEFT SIDEBAR -->
-            <div class="col-12 col-md-4 col-lg-3 d-flex flex-column border-end bg-white offcanvas-md offcanvas-start shadow-sm z-3" id="sidebar">
-                <div class="p-3 header-bg border-bottom d-flex flex-column gap-2">
-                    <div class="d-flex align-items-center mb-1">
-                        <div class="avatar bg-primary text-white me-2 shadow-sm"><i class="bi bi-person-fill"></i></div>
-                        <strong class="fs-5 text-dark" id="myUsernameDisplay">User</strong>
-                        <button class="btn btn-sm btn-close d-md-none ms-auto" data-bs-dismiss="offcanvas" data-bs-target="#sidebar"></button>
-                    </div>
-                    <div class="d-flex align-items-center justify-content-between bg-white rounded-pill p-2 border shadow-sm">
-                        <span class="small text-muted text-truncate me-2 ms-2">Room: <strong id="roomIdDisplay" class="text-primary">---</strong></span>
-                        <button class="btn btn-sm btn-light rounded-pill px-3 py-1" id="copyLinkBtn" title="Copy Room Link">
-                            <i class="bi bi-link-45deg"></i> Copy
-                        </button>
-                    </div>
-                </div>
+        <!-- BODY -->
+        <div class="app-body d-flex flex-grow-1 overflow-hidden position-relative">
 
-                <div class="p-2 border-bottom header-bg">
-                    <div class="input-group input-group-sm">
-                        <span class="input-group-text bg-white border-end-0 rounded-start-pill ps-3"><i class="bi bi-search text-muted"></i></span>
-                        <input type="text" id="searchInput" class="form-control border-start-0 bg-white rounded-end-pill" placeholder="Search users...">
+            <!-- SIDEBAR -->
+            <div id="sidebar" class="sidebar bg-panel border-end border-secondary d-flex flex-column transition-all">
+                <div class="p-3 border-bottom border-secondary d-flex align-items-center justify-content-between">
+                    <strong class="text-white fs-5"><i class="bi bi-terminal text-accent me-2"></i>HackChat</strong>
+                    <button class="btn btn-sm text-accent d-md-none" onclick="toggleSidebar()"><i class="bi bi-x-lg fs-4"></i></button>
+                </div>
+                <div class="p-3 border-bottom border-secondary bg-main d-flex justify-content-between align-items-center">
+                    <div class="d-flex flex-column">
+                        <small class="sidebar-label">Room ID</small>
+                        <strong class="text-accent fs-6" id="roomIdDisplay">---</strong>
                     </div>
+                    <button class="btn btn-outline-accent rounded-pill btn-sm px-3 fw-bold" onclick="copyLink()" id="copyLinkBtn">Copy</button>
                 </div>
-
-                <div class="flex-grow-1 overflow-auto p-2 chat-bg-sidebar" id="usersList">
-                    <!-- Users dynamically populated -->
-                </div>
+                <div class="p-2 px-3 mt-2 sidebar-label fw-bold">Connected Users</div>
+                <div id="usersList" class="flex-grow-1 overflow-auto p-2"></div>
             </div>
 
-            <!-- 💬 MIDDLE CHAT SECTION -->
-            <div class="col-12 col-md-8 col-lg-9 d-flex flex-column position-relative transition-all" id="chat-section">
-                <!-- Chat Header -->
-                <div class="p-3 header-bg border-bottom d-flex align-items-center justify-content-between shadow-sm z-2">
-                    <div class="d-flex align-items-center">
-                        <button class="btn btn-light rounded-circle shadow-sm d-md-none me-3" data-bs-toggle="offcanvas" data-bs-target="#sidebar">
-                            <i class="bi bi-list fs-5"></i>
-                        </button>
+            <!-- ===== VIEW: CHAT ===== -->
+            <div id="view-chat" class="view flex-grow-1 d-flex flex-column bg-main">
+                <div class="p-3 border-bottom border-secondary d-flex justify-content-between align-items-center bg-panel shadow-sm flex-shrink-0">
+                    <div class="d-flex align-items-center gap-3">
+                        <button class="btn btn-sm btn-dark border-secondary d-md-none text-accent" onclick="toggleSidebar()"><i class="bi bi-list fs-4"></i></button>
                         <div>
-                            <h5 class="m-0 mb-1 fw-bold text-dark">Global Room</h5>
-                            <small class="text-success fw-medium d-flex align-items-center gap-1">
-                                <span class="online-dot position-static"></span> <span id="onlineCount">0 online</span>
-                            </small>
+                            <strong class="m-0 fs-5 text-white d-block">Global Server</strong>
+                            <span class="chat-room-subtitle">Chat in unique room</span>
                         </div>
                     </div>
-                    
-                    <div class="d-flex align-items-center gap-2">
-                        <button class="btn btn-light rounded-circle shadow-sm icon-btn" id="topAudioCallBtn" title="Voice Call">
-                            <i class="bi bi-telephone-fill text-primary"></i>
-                        </button>
-                        <button class="btn btn-light rounded-circle shadow-sm icon-btn" id="topVideoCallBtn" title="Video Call">
-                            <i class="bi bi-camera-video-fill text-primary"></i>
-                        </button>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-dark border-secondary rounded-circle icon-btn text-accent" onclick="initiateCall(false,null)" title="Voice Call"><i class="bi bi-telephone-fill"></i></button>
+                        <button class="btn btn-dark border-secondary rounded-circle icon-btn text-accent" onclick="initiateCall(true,null)" title="Video Call"><i class="bi bi-camera-video-fill"></i></button>
                     </div>
                 </div>
-
-                <!-- Chat Messages Area -->
-                <div class="flex-grow-1 p-3 overflow-auto chat-bg d-flex flex-column" id="chatMessages">
-                    <div class="text-center my-3"><span class="badge bg-secondary bg-opacity-50 text-dark rounded-pill px-3 py-2 shadow-sm border border-secondary">Welcome to the Chat</span></div>
-                </div>
-
-                <div id="typingIndicator" class="px-4 py-1 text-muted small bg-transparent d-none fw-medium" style="font-style: italic;">
-                    Someone is typing...
-                </div>
-
-                <!-- Input Area with File Transfer -->
-                <div class="p-3 bg-white border-top shadow-sm">
-                    <div class="input-group input-group-lg bg-light rounded-pill p-1 align-items-center shadow-inner border border-light">
-                        <button class="btn btn-light rounded-circle ms-1 icon-btn text-primary shadow-sm" id="fileAttachBtn" title="Send File">
-                            <i class="bi bi-plus-lg fs-5"></i>
+                <div id="chatMessages" class="flex-grow-1 p-3 overflow-auto d-flex flex-column text-light"></div>
+                <div class="p-3 border-top border-secondary bg-panel flex-shrink-0">
+                    <div class="input-group bg-dark rounded-pill p-1 border border-secondary shadow-sm align-items-center">
+                        <button class="btn btn-link text-accent text-decoration-none" onclick="document.getElementById('fileInput').click()">
+                            <i class="bi bi-paperclip fs-5"></i>
                         </button>
-                        <input type="file" id="fileInput" class="d-none">
-                        <input type="text" id="messageInput" class="form-control border-0 bg-transparent px-3 fs-6 shadow-none" placeholder="Type a message..." autocomplete="off">
-                        <button class="btn btn-primary rounded-circle me-1 icon-btn shadow" id="sendBtn">
-                            <i class="bi bi-send-fill"></i>
+                        <input type="file" id="fileInput" class="d-none" accept="image/*, .pdf, .txt" onchange="handleFileSelect(event)">
+                        <input type="text" id="messageInput" class="form-control border-0 bg-transparent shadow-none px-2 text-white custom-input" placeholder="Type a Command..." autocomplete="off">
+                        <button id="sendBtn" class="btn btn-accent rounded-circle me-1" style="width:40px;height:40px;display:flex;justify-content:center;align-items:center;">
+                            <i class="bi bi-send-fill text-dark"></i>
                         </button>
                     </div>
                 </div>
             </div>
 
-            <!-- 📞 RIGHT CALL PANEL (Hidden by Default) -->
-            <div class="col-12 col-lg-4 d-none flex-column bg-dark text-white border-start transition-all position-relative" id="call-panel">
-                <div class="p-3 border-bottom border-secondary d-flex align-items-center justify-content-between bg-black z-3">
-                    <h5 class="m-0 text-white"><i class="bi bi-telephone-inbound-fill me-2"></i> In Call</h5>
-                    <span id="callLiveBadge" class="badge bg-danger pulse-anim rounded-pill px-3 d-none">Live</span>
-                </div>
-                
-                <div class="flex-grow-1 position-relative d-flex justify-content-center align-items-center bg-dark overflow-hidden">
-                    
-                    <!-- LARGE CENTER AVATAR (Shows when connecting or video is off) -->
-                    <div id="callAvatarContainer" class="text-center z-2 transition-all">
-                        <div id="callAvatar" class="call-avatar-lg shadow-lg mb-3">?</div>
-                        <h4 id="callPeerNameDisplay" class="fw-bold mb-1">Connecting...</h4>
-                        <div class="text-muted small" id="callStatus">Dialing...</div>
+            <!-- ===== VIEW: PARTICIPANTS ===== -->
+            <div id="view-participants" class="view flex-grow-1 d-flex flex-column bg-main d-none">
+                <div class="p-3 border-bottom border-secondary d-flex justify-content-between align-items-center bg-panel shadow-sm flex-shrink-0">
+                    <div class="d-flex align-items-center gap-3">
+                        <button class="btn btn-sm btn-dark border-secondary d-md-none text-accent" onclick="toggleSidebar()"><i class="bi bi-list fs-4"></i></button>
+                        <div>
+                            <strong class="m-0 fs-5 text-white d-block">Participants</strong>
+                            <span class="chat-room-subtitle">Everyone connected to this room</span>
+                        </div>
                     </div>
+                </div>
+                <div id="participantsGrid" class="flex-grow-1 p-4 overflow-auto participants-grid"></div>
+            </div>
 
-                    <!-- VIDEOS -->
-                    <video id="remoteVideo" autoplay playsinline class="w-100 h-100 object-fit-cover position-absolute top-0 start-0 z-1 d-none"></video>
-                    <video id="localVideo" autoplay playsinline muted class="position-absolute bottom-0 end-0 m-3 rounded-4 border border-2 border-white shadow-lg d-none z-3" style="width: 110px; height: 150px; object-fit: cover;"></video>
+            <!-- ===== VIEW: CALL ===== -->
+            <div id="view-call" class="view flex-grow-1 d-flex flex-column bg-main d-none">
+
+                <!-- Call header -->
+                <div class="p-3 d-flex justify-content-between align-items-center bg-panel border-bottom border-secondary flex-shrink-0">
+                    <span class="text-accent fw-bold"><i class="bi bi-shield-lock-fill me-2"></i>Secure P2P Link</span>
+                    <span id="callStatus" class="badge bg-dark text-white border border-secondary">Idle</span>
                 </div>
 
-                <!-- Call Controls -->
-                <div class="p-4 bg-black d-flex justify-content-center gap-4 border-top border-secondary z-3">
-                    <button class="btn btn-outline-light rounded-circle icon-btn-lg shadow" id="toggleMicBtn"><i class="bi bi-mic-fill"></i></button>
-                    <button class="btn btn-outline-light rounded-circle icon-btn-lg shadow" id="toggleCamBtn"><i class="bi bi-camera-video-fill"></i></button>
-                    <button class="btn btn-danger rounded-circle icon-btn-lg shadow" id="endCallBtn"><i class="bi bi-telephone-x-fill"></i></button>
+                <!-- Call main area -->
+                <div class="flex-grow-1 position-relative d-flex justify-content-center align-items-center overflow-hidden call-bg">
+                    <!-- Avatar / idle state -->
+                    <div id="callAvatarContainer" class="d-flex flex-column align-items-center z-2 text-center px-3">
+                        <div id="callRingWrap" class="call-ring-wrap mb-4">
+                            <div id="callAvatar" class="call-big-avatar bg-accent text-dark fw-bold">?</div>
+                        </div>
+                        <h3 id="callPeerName" class="text-white fw-bold mb-2">No active call</h3>
+                        <span id="callStatusText" class="text-muted small">Start a call from the Chat tab or Participants tab</span>
+                    </div>
+                    <video id="remoteVideo" class="position-absolute top-0 start-0 w-100 h-100 object-fit-cover z-1 d-none" autoplay playsinline></video>
+                    <video id="localVideo" class="position-absolute bottom-0 end-0 m-3 border border-2 border-accent rounded shadow-lg z-3" style="width:120px;height:160px;object-fit:cover;background:#222;" autoplay playsinline muted></video>
+                </div>
+
+                <!-- Call controls -->
+                <div class="p-4 bg-panel border-top border-secondary d-flex justify-content-center gap-4 flex-shrink-0">
+                    <div class="d-flex flex-column align-items-center gap-1">
+                        <button id="ctrl-mute" class="btn btn-dark border-secondary text-accent rounded-circle call-ctrl-btn shadow"><i class="bi bi-mic-fill"></i></button>
+                        <small class="text-muted ctrl-label">Mute</small>
+                    </div>
+                    <div class="d-flex flex-column align-items-center gap-1">
+                        <button id="ctrl-speaker" class="btn btn-dark border-secondary text-accent rounded-circle call-ctrl-btn shadow"><i class="bi bi-volume-up-fill"></i></button>
+                        <small class="text-muted ctrl-label">Speaker</small>
+                    </div>
+                    <div class="d-flex flex-column align-items-center gap-1">
+                        <button id="ctrl-video" class="btn btn-dark border-secondary text-accent rounded-circle call-ctrl-btn shadow"><i class="bi bi-camera-video-fill"></i></button>
+                        <small class="text-muted ctrl-label">Video</small>
+                    </div>
+                    <div class="d-flex flex-column align-items-center gap-1">
+                        <button id="ctrl-hangup" class="btn btn-danger rounded-circle call-ctrl-btn shadow"><i class="bi bi-telephone-x-fill"></i></button>
+                        <small class="text-muted ctrl-label">End</small>
+                    </div>
                 </div>
             </div>
 
-        </div>
-    </div>
+        </div><!-- /app-body -->
+    </div><!-- /app-root -->
 
-    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.ably.com/lib/ably.min-1.js"></script>
-    <script src="https://unpkg.com/peerjs@1.5.1/dist/peerjs.min.js"></script>
+    <script src="https://unpkg.com/simple-peer@9.11.1/simplepeer.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
